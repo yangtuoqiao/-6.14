@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<title>祝川川生日快乐</title>
+
+<style>
+@font-face{
+    font-family:"霞鹜文楷";
+    src:url("霞鹜文楷.ttf") format("truetype");
+    font-weight:normal;
+    font-style:normal;
+}
+body{
+    margin:0;
+    overflow:hidden;
+    background: radial-gradient(circle,#14152a,#070812);
+    font-family:"霞鹜文楷","Microsoft YaHei",sans-serif;
+}
+
+
+/* ================= 信封 ================= */
+#startScreen{
+    position:fixed;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    background:#14152a;
+    z-index:9999;
+}
+
+.envelope{
+    width:160px;
+    height:110px;
+    background:#ff4da6;
+    border-radius:8px;
+    position:relative;
+    cursor:pointer;
+}
+
+.envelope:before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    border-left:80px solid transparent;
+    border-right:80px solid transparent;
+    border-top:60px solid #ff7abf;
+}
+
+.tip{color:white;margin-top:15px}
+
+/* ================= 主页面 ================= */
+.main{display:none}
+
+/* ================= 🎂蛋糕 ================= */
+.center{
+    position:absolute;
+    top:25%;
+    left:50%;
+    transform:translate(-50%,0);
+    text-align:center;
+    color:white;
+    z-index:1001;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:32px;
+}
+
+.flame{
+    width:18px;
+    height:28px;
+    background:radial-gradient(circle,#fff,#ffcc00,#ff5a00);
+    border-radius:50%;
+    animation:flick 0.15s infinite alternate;
+}
+
+.flameLeft,
+.flameRight{
+    margin-top:14px;
+}
+
+.flameCenter{
+    margin-top:0;
+}
+
+@keyframes flick{
+    from{transform:scale(1);}
+    to{transform:scale(1.25) translateY(-2px);}
+}
+
+.cakeTitle{
+    position:absolute;
+    top:70%;
+    left:50%;
+    transform:translate(-50%,0);
+    text-align:center;
+    color:white;
+    font-size:28px;
+    font-weight:700;
+    z-index:1003;
+}
+
+/* ================= 交互层 ================= */
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.88);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:10000;
+    padding:20px;
+}
+#cakeChooser.overlay{
+    background:rgba(240,117,164,0.88);
+}
+.overlay.active{display:flex;}
+.chooserCard{
+    width:min(640px,100%);
+    background:rgba(255,225,235,0.96);
+    border:1px solid rgba(255,182,193,0.9);
+    border-radius:16px;
+    padding:24px;
+    text-align:center;
+    color:#F075A4;
+}
+.chooserTitle,
+.promptTitle{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:16px;
+    color:#F075A4;
+}
+.cakeOptions{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+.cakeOption{
+    cursor:pointer;
+    border:1px solid rgba(255,182,193,0.9);
+    border-radius:14px;
+    overflow:hidden;
+    background:#ffe6f2;
+    transition:transform 0.2s ease, border-color 0.2s ease;
+}
+.cakeOption:hover{transform:translateY(-4px);border-color:#ff9fca;}
+.cakeOption img{
+    width:100%;
+    display:block;
+}
+.cakeOption div{
+    padding:10px 8px 12px;
+    font-size:14px;
+    color:#4b1f38;
+}
+.chooseHint{
+    margin-top:18px;
+    font-size:16px;
+    color:#F075A4;
+}
+.hidden{display:none!important;}
+.cakeDisplay{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:180px;
+    min-height:180px;
+    z-index:1002;
+}
+.cakeDisplay img{
+    width:100%;
+    border-radius:14px;
+    box-shadow:0 0 22px rgba(255,255,255,0.16);
+}
+.prompt{
+    position:absolute;
+    top:70%;
+    left:50%;
+    transform:translate(-50%,0);
+    width:260px;
+    text-align:center;
+    z-index:1002;
+    color:#F075A4;
+}
+.prompt button,
+.prompt .button{
+    margin-top:12px;
+    padding:10px 18px;
+    font-size:16px;
+    border:none;
+    border-radius:999px;
+    background:#ff78c8;
+    color:#ffffff;
+    cursor:pointer;
+}
+.prompt button:hover{background:#ff5aa2;}
+/* ================= 🎵粉色碟 ================= */
+.player{
+    position:fixed;
+    bottom:20px;
+    left:20px;
+    width:72px;
+    height:72px;
+    border-radius:50%;
+    background:conic-gradient(#ffd1dc,#ffb6c1,#ffc0cb,#ffe4ec);
+    animation:spin 3.8s linear infinite;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    z-index:999;
+}
+
+.inner{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:white;
+}
+
+@keyframes spin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+
+/* ================= 弹幕 ================= */
+.popText{
+    position:absolute;
+    padding:6px 12px;
+    border-radius:999px;
+    background:rgba(0,0,0,0.35);
+    border:1px solid rgba(255,255,255,0.25);
+    font-size:14px;
+    font-weight:600;
+    animation:pop 2s ease forwards;
+    pointer-events:none;
+}
+
+@keyframes pop{
+    0%{transform:scale(0.3);opacity:0;}
+    20%{transform:scale(1);opacity:1;}
+    100%{opacity:0;}
+}
+
+/* ================= canvas ================= */
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    pointer-events:none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 信封 -->
+<div id="startScreen">
+    <div class="envelope" id="openBtn"></div>
+    <div class="tip">点击打开生日礼物 🎁</div>
+</div>
+
+<!-- 蛋糕选择弹出页 -->
+<div id="cakeChooser" class="overlay">
+    <div class="chooserCard" id="chooserCard">
+        <div class="chooserTitle">选择一个电子蛋糕</div>
+        <div class="cakeOptions">
+            <div class="cakeOption" data-src="img/1.gif" data-title="粉色祝福蛋糕">
+                <img src="img/1.gif" alt="蛋糕1" />
+                <div>蛋糕 1</div>
+            </div>
+            <div class="cakeOption" data-src="img/2.gif" data-title="草莓甜心蛋糕">
+                <img src="img/2.gif" alt="蛋糕2" />
+                <div>蛋糕 2</div>
+            </div>
+            <div class="cakeOption" data-src="img/3.gif" data-title="蓝色梦幻蛋糕">
+                <img src="img/3.gif" alt="蛋糕3" />
+                <div>蛋糕 3</div>
+            </div>
+        </div>
+        <div class="chooseHint">点击图片选择你喜欢的电子蛋糕样子</div>
+    </div>
+</div>
+
+<!-- 主体 -->
+<div class="main" id="main">
+
+<div class="center">
+    <div class="flame flameLeft"></div>
+    <div class="flame flameCenter"></div>
+    <div class="flame flameRight"></div>
+</div>
+<div class="cakeTitle">🎂 祝川川生日快乐 🎂</div>
+
+<div class="player" id="player"><div class="inner"></div></div>
+
+<canvas id="fireworks"></canvas>
+
+</div>
+
+<script>
+
+/* ================= 状态锁 ================= */
+let started=false;
+
+/* ================= 音乐 ================= */
+const audio=new Audio("music/生日祝福歌.mp3");
+audio.loop=true;
+
+/* ================= 弹幕数据 ================= */
+const msgs=[
+"祝川川生日快乐！",
+"新的一岁暴富、爆美！",
+"学的都会，吃的都拉！！",
+"生活顺、学业顺、大便顺！！！！",
+"祝你永远都是快乐健康的小女孩 ❤️"
+];
+
+const cakeChooser=document.getElementById("cakeChooser");
+const cakeContainer=document.createElement("div");
+cakeContainer.className="cakeDisplay";
+const wishPrompt=document.createElement("div");
+wishPrompt.className="prompt hidden";
+const messageText=document.createElement("div");
+const wishBtn=document.createElement("button");
+wishBtn.id="wishBtn";
+wishBtn.innerText="许愿";
+wishPrompt.appendChild(messageText);
+wishPrompt.appendChild(wishBtn);
+
+const blowPrompt=document.createElement("div");
+blowPrompt.className="overlay hidden";
+blowPrompt.innerHTML=`
+    <div class="chooserCard">
+        <div class="promptTitle">请对着手机吹气，吹灭蜡烛</div>
+        <button id="readyBtn">好的</button>
+    </div>
+`;
+
+document.getElementById("main").appendChild(cakeContainer);
+document.getElementById("main").appendChild(wishPrompt);
+document.body.appendChild(blowPrompt);
+
+function showCakeChooser(){
+    cakeChooser.classList.add("active");
+}
+
+function hideCakeChooser(){
+    cakeChooser.classList.remove("active");
+}
+
+function setSelectedCake(src, title){
+    cakeContainer.innerHTML=`<img src="${src}" alt="已选蛋糕" />`;
+    hideCakeChooser();
+    messageText.innerText="可以许愿啦！";
+    wishPrompt.classList.remove("hidden");
+    pop(`已选择：${title}`);
+}
+
+Array.from(document.querySelectorAll(".cakeOption")).forEach(option=>{
+    option.onclick=()=>{
+        const src=option.dataset.src;
+        const title=option.dataset.title;
+        setSelectedCake(src,title);
+    };
+});
+
+wishBtn.onclick=()=>{
+    wishPrompt.classList.add("hidden");
+    messageText.innerText="";
+    setTimeout(()=>{
+        blowPrompt.classList.remove("hidden");
+    },10000);
+};
+
+const readyBtn=document.getElementById("readyBtn");
+const flameEl=document.querySelector(".flame");
+readyBtn.onclick=()=>{
+    blowPrompt.classList.add("hidden");
+    flameEl.style.animation="none";
+    flameEl.style.background="rgba(255,255,255,0.12)";
+    flameEl.style.boxShadow="0 0 30px rgba(255,255,255,0.12)";
+    pop("蜡烛已吹灭，愿望成真 🎉");
+};
+
+/* ================= 启动 ================= */
+document.getElementById("openBtn").onclick=()=>{
+
+    if(started) return;
+    started=true;
+
+    document.getElementById("startScreen").style.display="none";
+    document.getElementById("main").style.display="block";
+
+    audio.play().catch(()=>{});
+    showCakeChooser();
+
+    requestAnimationFrame(()=>{
+        startBurst();
+        startPeak();
+        startFireworks();
+    });
+};
+
+/* ================= 弹幕 ================= */
+function pop(text){
+    const d=document.createElement("div");
+    d.className="popText";
+
+    d.innerText=text||msgs[Math.floor(Math.random()*msgs.length)];
+
+    d.style.left=Math.random()*innerWidth+"px";
+    d.style.top=Math.random()*innerHeight+"px";
+    d.style.color=`hsl(${Math.random()*360},90%,65%)`;
+
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),2000);
+}
+
+/* ================= 普通弹幕（1秒一批） ================= */
+function startBurst(){
+    setInterval(()=>{
+        for(let i=0;i<50;i++){
+            setTimeout(()=>pop(),i*30);
+        }
+    },1000);
+}
+
+/* ================= 高潮弹幕 ================= */
+function startPeak(){
+    setInterval(()=>{
+        for(let i=0;i<100;i++){
+            setTimeout(()=>pop("川川生日快乐！！"),i*40);
+        }
+    },30000);
+}
+
+/* ================= 烟花（双倍密度） ================= */
+const c=document.getElementById("fireworks");
+const ctx=c.getContext("2d");
+
+function resize(){
+    c.width=innerWidth;
+    c.height=innerHeight;
+}
+resize();
+addEventListener("resize",resize);
+
+let ps=[];
+
+function P(x,y){
+    this.x=x;
+    this.y=y;
+    this.vx=(Math.random()-0.5)*6;
+    this.vy=(Math.random()-0.5)*6;
+    this.life=90;
+    this.color=`hsl(${Math.random()*360},100%,60%)`;
+}
+
+function boom(x,y){
+    for(let i=0;i<50;i++) ps.push(new P(x,y));
+}
+
+function loop(){
+    ctx.fillStyle="rgba(0,0,0,0.18)";
+    ctx.fillRect(0,0,c.width,c.height);
+
+    ps.forEach((p,i)=>{
+        p.x+=p.vx;
+        p.y+=p.vy;
+        p.life--;
+
+        ctx.fillStyle=p.color;
+        ctx.fillRect(p.x,p.y,2,2);
+
+        if(p.life<=0) ps.splice(i,1);
+    });
+
+    requestAnimationFrame(loop);
+}
+loop();
+
+function startFireworks(){
+    setInterval(()=>{
+        boom(Math.random()*c.width,Math.random()*c.height*0.6);
+    },250);
+}
+
+/* ================= 音乐控制 ================= */
+document.getElementById("player").onclick=()=>{
+    if(audio.paused) audio.play();
+    else audio.pause();
+};
+
+</script>
+
+</body>
+</html>
